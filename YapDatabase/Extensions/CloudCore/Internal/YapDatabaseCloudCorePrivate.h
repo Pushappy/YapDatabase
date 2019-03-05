@@ -20,7 +20,11 @@
 #import "YapCache.h"
 #import "YapManyToManyCache.h"
 
-#import "sqlite3.h"
+#ifdef SQLITE_HAS_CODEC
+  #import <SQLCipher/sqlite3.h>
+#else
+  #import "sqlite3.h"
+#endif
 
 /**
  * This version number is stored in the yap2 table.
@@ -168,9 +172,9 @@ typedef NS_OPTIONS(uint8_t, YDBCloudCore_EnumOps) {
 // - automatically merging duplicate operations within same commit
 // - automatically adding dependencies for operations in earlier commits (if using FlatGraph optimization)
 //
-- (NSArray *)processOperations:(NSArray *)operations
-						  inPipeline:(YapDatabaseCloudCorePipeline *)pipeline
-						withGraphIdx:(NSUInteger)operationsGraphIdx;
+- (NSArray<YapDatabaseCloudCoreOperation *> *)processOperations:(NSArray<YapDatabaseCloudCoreOperation *> *)operations
+                                                     inPipeline:(YapDatabaseCloudCorePipeline *)pipeline
+                                                   withGraphIdx:(NSUInteger)operationsGraphIdx;
 
 // Subclasses may override these methods to perform custom tasks as needed.
 - (void)didCompleteOperation:(YapDatabaseCloudCoreOperation *)operation;
